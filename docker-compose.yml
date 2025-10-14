@@ -22,8 +22,10 @@ services:
     
     volumes:
       - ./backend:/app
-    environment:
-      - DATABASE_URL=postgresql://admin:admin@db/auth_db
+    #environment:
+    #  - DATABASE_URL=postgresql://admin:admin@db/auth_db
+    env_file:
+      - .env
     depends_on:
       - db
 
