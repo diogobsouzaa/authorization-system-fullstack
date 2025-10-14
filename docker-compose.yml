@@ -1,0 +1,22 @@
+version: '3.8'
+
+#definindo containers
+services:
+  #backend
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    
+    volumes:
+      - ./backend:/app
+
+  #frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
