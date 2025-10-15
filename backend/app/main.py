@@ -5,6 +5,10 @@ from sqlalchemy.orm import Session
 from . import crud, models, schemas
 from .database import SessionLocal, engine
 
+from typing import Annotated
+from fastapi.security import OAuth2PasswordRequestForm
+from . import security
+
 #cria todas as tableas no banco de dados 
 models.Base.metadata.create_all(bind=engine)
 
@@ -28,6 +32,24 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.post("/token", response_model=schemas.Token)
+def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+    user = crud.get_user_by_email(db, email=form_data.username)
+
+    #verificando se o usuario existe e se a senha está correta
+    if not user or not security.verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect email or password",
+            headers = {"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token = security.create_access_token(
+        data={"sub": user.email}
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}
 
 # endpoint de cadastro
 @app.post("/users", response_model=schemas.User)
