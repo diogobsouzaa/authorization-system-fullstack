@@ -63,12 +63,13 @@ def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
 # endpoint de cadastro
 @app.post("/users", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(security.get_db)):
+    print(f"Dados recebidos: email={user.email}, password_length={len(user.password)}")
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail = "Email já registrado")
     return crud.create_user(db=db, user=user)
 
 #endpoint protegido
-@app.get("/users/me/", response_model = schemas.User)
+@app.get("/users/me", response_model = schemas.User)
 def read_users_me(current_user:Annotated[models.User, Depends(security.get_current_user)]):
     return current_user

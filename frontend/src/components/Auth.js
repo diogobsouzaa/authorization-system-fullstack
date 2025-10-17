@@ -1,23 +1,19 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
-//componente de formulario
-const AuthForm = ({buttonText, onSubmit}) =>{
-    //estados para armazenar email e senha
+const AuthForm = ({ buttonText, onSubmit }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleSubmit = (event) => {
-        event.preventDefault();//controlar o envio com js
-        onSubmit({email, password});
+        event.preventDefault();
+        onSubmit({ email, password });
     }
 
     return (
         <form onSubmit={handleSubmit}>
-
             <h2>{buttonText}</h2>
 
             <div>
-
                 <label htmlFor="email">Email:</label>
                 <input
                     type="email"
@@ -26,24 +22,22 @@ const AuthForm = ({buttonText, onSubmit}) =>{
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-
             </div>
 
             <div>
-
                 <label htmlFor="password">Senha:</label>
                 <input
                     type="password"
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.values)}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
                 />
-
             </div>
 
             <button type="submit">{buttonText}</button>
-        </form> 
-
+        </form>
     );
 };
 
