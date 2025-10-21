@@ -49,8 +49,8 @@ def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
     #verificando se o usuario existe e se a senha está correta
     if not user or not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
-            status_code=401,
-            detail="Incorrect email or password",
+            status_code=400,
+            detail="Senha ou email incorreto",
             headers = {"WWW-Authenticate": "Bearer"},
         )
     

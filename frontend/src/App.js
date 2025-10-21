@@ -1,15 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthForm from "./components/Auth";
 import "./App.css";
 
 function App() {
+  //dados do token
   const [token, setToken] = useState(null);
+  
+  //dados do usuario logado
+  const [currentUser, setCurrentUser] = useState(null);
+
   const [message, setMessage] = useState("");
+
+
+  //hook useEffect busca dados do usuario quando o token mudar
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!token){
+        setCurrentUser(null);
+        return;
+      }
+      try{
+        //requisição para endpoint protegido
+        const response = await fetch("http://localhost:8000/users/me", {
+          method: "GET",
+          headers: {
+            //cabeçalho de autenticação
+            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        if (!response.ok){
+          throw new Error(data.detail || 'Não foi possivel buscar os dados do usúario.');
+        }
+        setCurrentUser(data)
+      }catch (error){
+        setMessage(error.message)
+        setToken(null);
+      }
+    };
+    fetchUserData();
+
+  }, [token]); //roda sempre que o token mudar
 
   const handleRegister = async (credentials) => {
     setMessage("Registrando...");
     try {
-      // Garantimos que o objeto enviado tem as chaves 'email' e 'password'
+      // garantindo que o objeto enviado tem as chaves 'email' e 'password'
       const response = await fetch("http://localhost:8000/users", {
         method: "POST",
         headers: {
