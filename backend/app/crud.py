@@ -15,7 +15,13 @@ def create_user(db: Session, user: schemas.UserCreate):
     
     
     
-    db_user = models.User(email=user.email, hashed_password = hashed_password, role='user')
+    db_user = models.User(
+        email=user.email, 
+        hashed_password = hashed_password, 
+        role='user',
+        full_name = user.full_name,
+        date_of_birth = user.date_of_birth
+    )
 
     #adiciona no banco
     db.add(db_user)

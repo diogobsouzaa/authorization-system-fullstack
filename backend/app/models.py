@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, Date
 from .database import Base
 
 #Model usado para tabela 'users'
@@ -12,3 +12,6 @@ class User(Base):
     is_active = Column(Boolean, default = True)
 
     role = Column(String, default='user', nullable=False)
+
+    full_name = Column(String, nullable=False)
+    date_of_birth = Column(Date, nullable=True)

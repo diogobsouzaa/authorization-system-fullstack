@@ -150,11 +150,11 @@ async def auth_google(request: Request, db: Session = Depends(security.get_db)):
         raise HTTPException(status_code=400, detail="Não foi possivel obter informações do usuário do Google")
     
     user_email = user_info['email']
-
+    user_name = user_info.get("name", "Usuário Google")
     db_user = crud.get_user_by_email(db, email=user_email)
     if not db_user:
         #usuario não existe
-        new_user_schema = schemas.UserCreate(email=user_email, password=None)
+        new_user_schema = schemas.UserCreate(email=user_email, password=None, full_name=user_name, date_of_birth=None)
         db_user = crud.create_user(db=db, user=new_user_schema)
     
     #criando token JWT
