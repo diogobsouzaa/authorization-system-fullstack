@@ -11,6 +11,9 @@ function App() {
 
   const [message, setMessage] = useState("");
 
+  //dados da rota admin
+  const[adminData, setAdminData] = useState(null);
+
 
   //hook useEffect busca dados do usuario quando o token mudar
   useEffect(() => {
@@ -33,7 +36,22 @@ function App() {
         if (!response.ok){
           throw new Error(data.detail || 'Não foi possivel buscar os dados do usúario.');
         }
+        //se busca bem sucedida, armazena dados do usuario
         setCurrentUser(data)
+
+        //buscar dados admin
+        const adminResponse = await fetch("http://localhost:8000/admin/data", {
+          method: "GET",
+          headers:{"Authorization": `Bearer ${token}`},
+        });
+
+        if (adminResponse.ok){
+          const data = await adminResponse.json();
+          setAdminData(data.message);
+        }else{
+          setAdminData(null)
+        }
+
       }catch (error){
         setMessage(error.message)
         setToken(null);
@@ -120,14 +138,29 @@ function App() {
         {message && <p>{message}</p>}
         {!token ? (
           <div className="auth-container">
-            {/* O mesmo AuthForm é usado para ambos, passando a função correta */}
+            
             <AuthForm buttonText="Cadastrar" onSubmit={handleRegister} />
             <AuthForm buttonText="Login" onSubmit={handleLogin} />
           </div>
         ) : (
           <div>
-            <h2>Bem-vindo! Você está logado.</h2>
-            <p>Seu token de acesso foi gerado.</p>
+            {currentUser ? (
+              //eximbindo email e role do usuario
+              <h2>Bem-Vindo, {currentUser.email}! ({currentUser.role})</h2>
+            ) : (
+              <h2>Bem-Vindo, Carregando dados...</h2>
+
+            )}
+            <p>Você está logado e seus dados foram carregados</p>
+            
+            {/* renderização condicional da seção de admin */}
+            {adminData && (
+              <div style = {{padding: '10px', border: '1px solid yellow', margin: '20px'}}>
+                <strong>Painel de Admin:</strong>
+                <p>{adminData}</p>
+              </div>
+            )}
+
             <button onClick={handleLogout}>Logout</button>
           </div>
         )}

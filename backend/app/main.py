@@ -2,15 +2,20 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.orm import Session
-from . import crud, models, schemas, security
+from . import crud, models, schemas, security, database
 from .database import SessionLocal, engine
 
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 
+import time
+import os
+from sqlalchemy import exc, text
+
+
 
 #cria todas as tableas no banco de dados 
-models.Base.metadata.create_all(bind=engine)
+#models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -73,3 +78,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(security.get_db)
 @app.get("/users/me", response_model = schemas.User)
 def read_users_me(current_user:Annotated[models.User, Depends(security.get_current_user)]):
     return current_user
+
+@app.get("/admin/data")
+def read_admin_data(current_user: Annotated[models.User, Depends(security.get_current_admin_user)]):
+    #rota protegida, somente usuarios com role 'admin'
+    return {"message" : "Bem-Vindo, Admin!", "user": current_user.email}

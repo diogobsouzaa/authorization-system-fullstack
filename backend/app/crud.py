@@ -7,7 +7,7 @@ def get_user_by_email(db: Session, email: str):
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = models.User(email=user.email, hashed_password = hashed_password)
+    db_user = models.User(email=user.email, hashed_password = hashed_password, role='user')
 
     #adiciona no banco
     db.add(db_user)
