@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.orm import Session
@@ -12,12 +12,56 @@ import time
 import os
 from sqlalchemy import exc, text
 
+from starlette.responses import RedirectResponse
+from authlib.integrations.starlette_client import OAuth
+from .config import settings
+
+from starlette.middleware.sessions import SessionMiddleware
+
+def wait_for_db():
+    """
+    aguarda o banco de dados ficar disponível antes de prosseguir
+    """
+    max_retries = 10
+    retry_interval = 3
+    
+    for attempt in range(max_retries):
+        try:
+            # Tenta estabelecer uma conexão simples
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            print("Conexão com o banco estabelecida")
+            return True
+        except exc.OperationalError:
+            if attempt < max_retries - 1:
+                print(f"Aguardando banco... ({attempt + 1}/{max_retries})")
+                time.sleep(retry_interval)
+            else:
+                print("Não foi possível conectar ao banco após várias tentativas")
+                raise
+
+# aguarda o banco ficar pronto antes de criar tabelas
+wait_for_db()
+models.Base.metadata.create_all(bind=engine)
+print("Tabelas criadas com sucesso")
 
 
 #cria todas as tableas no banco de dados 
 #models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+
+#autorização do cliente Authlib / OAuth
+oauth = OAuth()
+oauth.register(
+    name='google',
+    client_id=settings.GOOGLE_CLIENT_ID,
+    client_secret=settings.GOOGLE_CLIENT_SECRET,
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs = {'scope': 'openid email profile'}
+)
 
 
 origins = ["http://localhost:3000",]
@@ -83,3 +127,41 @@ def read_users_me(current_user:Annotated[models.User, Depends(security.get_curre
 def read_admin_data(current_user: Annotated[models.User, Depends(security.get_current_admin_user)]):
     #rota protegida, somente usuarios com role 'admin'
     return {"message" : "Bem-Vindo, Admin!", "user": current_user.email}
+
+@app.get("/login/google")
+async def login_google(request: Request):
+    redirect_uri = request.url_for('auth_google') 
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+@app.get("/auth/google", name="auth_google")
+async def auth_google(request: Request, db: Session = Depends(security.get_db)):
+    """
+    processa a resposta do Google, cria/encontra o usuário,
+    cria um token JWT local e redireciona o usuário de volta para o frontend.
+    """
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Falha ao autorizar com o Google.")
+    
+    #pede os dados do usuario ao google usando o token deles
+    user_info = token.get("userinfo")
+    if not user_info:
+        raise HTTPException(status_code=400, detail="Não foi possivel obter informações do usuário do Google")
+    
+    user_email = user_info['email']
+
+    db_user = crud.get_user_by_email(db, email=user_email)
+    if not db_user:
+        #usuario não existe
+        new_user_schema = schemas.UserCreate(email=user_email, password=None)
+        db_user = crud.create_user(db=db, user=new_user_schema)
+    
+    #criando token JWT
+    access_token = security.create_access_token(
+        data={"sub": db_user.email}
+    )
+
+    #redirecionando usuario
+    response = RedirectResponse(url=f"http://localhost:3000?token={access_token}")
+    return response

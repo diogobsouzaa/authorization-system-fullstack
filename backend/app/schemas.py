@@ -4,7 +4,7 @@ class UserBase(BaseModel):
     email: EmailStr = Field(..., description="Email do usuário")
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=6, description="Senha com pelo menos 6 caracteres")
+    password: str | None = Field(default = None, min_length=6, description="Senha com pelo menos 6 caracteres")
     
 class User(UserBase):
     id: int

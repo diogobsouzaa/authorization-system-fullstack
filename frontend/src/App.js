@@ -4,7 +4,7 @@ import "./App.css";
 
 function App() {
   //dados do token
-  const [token, setToken] = useState(null);
+  //const [token, setToken] = useState(null);
   
   //dados do usuario logado
   const [currentUser, setCurrentUser] = useState(null);
@@ -14,6 +14,15 @@ function App() {
   //dados da rota admin
   const[adminData, setAdminData] = useState(null);
 
+  const [token, setToken] = useState (() => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get('token');
+    //limpa url, token não fica visivel
+    if (tokenFromUrl){
+      window.history.pushState({}, document.title, "/");
+    }
+    return tokenFromUrl;
+  });
 
   //hook useEffect busca dados do usuario quando o token mudar
   useEffect(() => {
@@ -141,6 +150,14 @@ function App() {
             
             <AuthForm buttonText="Cadastrar" onSubmit={handleRegister} />
             <AuthForm buttonText="Login" onSubmit={handleLogin} />
+
+            {/*BOTÃO DE LOGIN COM GOOGLE */}
+            <div className="google-login">
+              <p>Ou</p>
+              <a href="http://localhost:8000/login/google" className="google-button">
+              Login com Google
+              </a>
+            </div>
           </div>
         ) : (
           <div>
