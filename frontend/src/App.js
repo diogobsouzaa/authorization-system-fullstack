@@ -162,19 +162,18 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
         {message && <p style = {{color: 'yellow'}}>{message}</p>}
         <Routes>
-          {/* rota 1: Página Inicial */}
+          {/* rota 1: página inicial */}
           <Route path="/" element={!token ? <HomePage /> : <Navigate to="/dashboard" />} />
 
-          {/* rota 2: Página de Login */}
+          {/* rota 2: página de login */}
           <Route path="/login" element={!token ? <LoginPage handleLogin={handleLogin} message={message} /> : <Navigate to="/dashboard" />} />
 
-          {/* rota 3: Página de Cadastro */}
+          {/* rota 3: página de cadastro */}
           <Route path="/register" element={!token ? <RegisterPage handleRegister={handleRegister} message={message} /> : <Navigate to="/dashboard" />} />
 
-          {/* rota 4: Painel (Protegida) */}
+          {/* rota 4: painel (protegida) */}
           <Route 
             path="/dashboard" 
             element={
@@ -187,7 +186,6 @@ function App() {
           {/*rota fallback para paginas não encontradas*/}
           <Route path="*" element={<Navigate to='/' />} />
         </Routes>
-      </header>
     </div>
   );
 }

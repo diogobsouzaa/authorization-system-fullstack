@@ -1,80 +1,33 @@
+html,
+body,
+#root,
 .App {
-  text-align: center;
+  height: 100%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/*usada em LoginPage e RegisterPage*/
+.form-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
-.auth-container {
-  display: flex;
-  gap: 50px;
+.form-signin {
+  max-width: 400px;
+  padding: 1rem;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 20px;
-  border: 1px solid white;
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+/* ajusta o espaçamento dos inputs */
+.form-signin input {
+  margin-bottom: 10px;
   border-radius: 8px;
-}
-
-form div{
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-input {
-  font-size: 16px;
-  padding: 5px;
-}
-
-button{
-  font-size: 16px;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.google-button{
-  background-color: #4285f4;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.google-login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.page-container {
-  text-align: center;
-  padding: 20px;
-}
-
-.links-container {
-  margin-top: 20px;
-}
-
-.links-container a {
-  color: #61dafb;
-  margin: 0 10px;
-  text-decoration: none;
-}
-
-.links-container a:hover {
-  text-decoration: underline;
 }

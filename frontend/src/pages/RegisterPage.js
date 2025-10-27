@@ -5,14 +5,23 @@ import { Link } from 'react-router-dom';
 const RegisterPage = ({handleRegister, message}) => {
     return (
 
-        <div>
+        <div className="form-container">
             <AuthForm 
-                buttonText="Cadastrar" 
+                buttonText="Cadastre-se" 
                 onSubmit={handleRegister} 
                 isRegister={true} // Diz ao formulário para mostrar os campos extras
             />
-            {message && <p>{message}</p>}
-            <p>Já tem uma conta? <Link to="/login">Faça o login aqui</Link></p>
+            {message && <p className="mt-3 text-warning">{message}</p>}
+            
+            <p className="mt-3">Já tem uma conta? <Link to="/login">Faça o login aqui</Link></p>
+            
+            <div className="mt-4">
+                <Link to="/" className="btn btn-outline-secondary btn-sm">
+                    Voltar à Página Inicial
+                </Link>
+            </div>
+        
+        
         </div>
     );
 };
