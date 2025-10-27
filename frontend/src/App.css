@@ -52,3 +52,29 @@ button{
   text-decoration: none;
   font-weight: bold;
 }
+
+.google-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.links-container {
+  margin-top: 20px;
+}
+
+.links-container a {
+  color: #61dafb;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+.links-container a:hover {
+  text-decoration: underline;
+}

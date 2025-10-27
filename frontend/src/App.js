@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import AuthForm from "./components/Auth";
+//import AuthForm from "./components/Auth";
 import "./App.css";
+
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
   //dados do token
@@ -24,11 +30,24 @@ function App() {
     return tokenFromUrl;
   });
 
+  const navigate = useNavigate();
+
+  //token vindo da url - Google login
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get('token');
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+      //window.history.pushState({}, document.title, "/dashboard"); // Redireciona para o dashboard
+    }
+  }, []);
+
   //hook useEffect busca dados do usuario quando o token mudar
   useEffect(() => {
     const fetchUserData = async () => {
       if (!token){
         setCurrentUser(null);
+        setAdminData(null);
         return;
       }
       try{
@@ -79,10 +98,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password,
-        }),
+        body: JSON.stringify(credentials),
       });
 
       const data = await response.json();
@@ -100,6 +116,7 @@ function App() {
       }
 
       setMessage("Usuário registrado com sucesso! Faça o login.");
+      navigate('/login');
     } catch (error) {
       setMessage(error.message);
     }
@@ -110,7 +127,7 @@ function App() {
     try {
       // O endpoint /token espera dados de formulário, não JSON.
       const formData = new URLSearchParams();
-      // O backend espera 'username' para o login, que no nosso caso é o email do usuário.
+      // O backend espera 'username' para o login, é o email do usuário.
       formData.append("username", credentials.email);
       formData.append("password", credentials.password);
       
@@ -128,8 +145,8 @@ function App() {
         throw new Error(data.detail || "Falha no login.");
       }
       setToken(data.access_token);
-      setMessage(""); // Limpa a mensagem após o login bem-sucedido
-      
+      setMessage(""); // limpa a mensagem após o login bem-sucedido
+      navigate('/dashboard');
     } catch (error) {
       setMessage(error.message);
     }
@@ -137,50 +154,39 @@ function App() {
 
   const handleLogout = () => {
     setToken(null);
+    setCurrentUser(null);
+    setAdminData(null)
     setMessage("Você foi desconectado");
+    navigate('/');
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Sistema de Autenticação</h1>
-        {message && <p>{message}</p>}
-        {!token ? (
-          <div className="auth-container">
-            
-            <AuthForm buttonText="Cadastrar" onSubmit={handleRegister} />
-            <AuthForm buttonText="Login" onSubmit={handleLogin} />
+        {message && <p style = {{color: 'yellow'}}>{message}</p>}
+        <Routes>
+          {/* rota 1: Página Inicial */}
+          <Route path="/" element={!token ? <HomePage /> : <Navigate to="/dashboard" />} />
 
-            {/*BOTÃO DE LOGIN COM GOOGLE */}
-            <div className="google-login">
-              <p>Ou</p>
-              <a href="http://localhost:8000/login/google" className="google-button">
-              Login com Google
-              </a>
-            </div>
-          </div>
-        ) : (
-          <div>
-            {currentUser ? (
-              //eximbindo email e role do usuario
-              <h2>Bem-Vindo, {currentUser.email}! ({currentUser.role})</h2>
-            ) : (
-              <h2>Bem-Vindo, Carregando dados...</h2>
+          {/* rota 2: Página de Login */}
+          <Route path="/login" element={!token ? <LoginPage handleLogin={handleLogin} message={message} /> : <Navigate to="/dashboard" />} />
 
-            )}
-            <p>Você está logado e seus dados foram carregados</p>
-            
-            {/* renderização condicional da seção de admin */}
-            {adminData && (
-              <div style = {{padding: '10px', border: '1px solid yellow', margin: '20px'}}>
-                <strong>Painel de Admin:</strong>
-                <p>{adminData}</p>
-              </div>
-            )}
+          {/* rota 3: Página de Cadastro */}
+          <Route path="/register" element={!token ? <RegisterPage handleRegister={handleRegister} message={message} /> : <Navigate to="/dashboard" />} />
 
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-        )}
+          {/* rota 4: Painel (Protegida) */}
+          <Route 
+            path="/dashboard" 
+            element={
+              token ? 
+              <DashboardPage currentUser={currentUser} adminData={adminData} handleLogout={handleLogout} /> : 
+              <Navigate to="/login" />
+            } 
+          />
+
+          {/*rota fallback para paginas não encontradas*/}
+          <Route path="*" element={<Navigate to='/' />} />
+        </Routes>
       </header>
     </div>
   );
