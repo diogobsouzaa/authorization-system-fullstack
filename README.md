@@ -4,7 +4,7 @@ Um sistema de autenticação completo e seguro, construído do zero com Python, 
 
 ## Stack de Tecnologias
 
-O projeto é 100% containerizado com Docker e dividido em três serviços principais: Backend, Frontend e Banco de Dados.
+O projeto é containerizado com Docker e dividido em três serviços principais: Backend, Frontend e Banco de Dados.
 
 <div>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
