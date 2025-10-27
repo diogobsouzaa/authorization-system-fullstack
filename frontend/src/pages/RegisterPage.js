@@ -11,7 +11,7 @@ const RegisterPage = ({handleRegister, message}) => {
                 onSubmit={handleRegister} 
                 isRegister={true} // Diz ao formulário para mostrar os campos extras
             />
-            {message && <p className="mt-3 text-warning">{message}</p>}
+    
             
             <p className="mt-3">Já tem uma conta? <Link to="/login">Faça o login aqui</Link></p>
             

@@ -9,7 +9,7 @@ const LoginPage = ({handleLogin, message}) => {
                 buttonText="Login" 
                 onSubmit={handleLogin} 
             />
-            {message && <p className="mt-3 text-warning">{message}</p>}
+            
             <p className="mt-3">Não tem uma conta? <Link to="/register">Cadastre-se aqui</Link></p>
             <div style={{ marginTop: '20px' }} className="text-center">
                 <p>Ou faça login com:</p>

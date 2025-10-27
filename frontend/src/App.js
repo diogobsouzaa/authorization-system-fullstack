@@ -161,31 +161,35 @@ function App() {
   };
 
   return (
-    <div className="App">
-        {message && <p style = {{color: 'yellow'}}>{message}</p>}
-        <Routes>
-          {/* rota 1: página inicial */}
-          <Route path="/" element={!token ? <HomePage /> : <Navigate to="/dashboard" />} />
+    <div>
+      {message && 
+        <div className="alert alert-warning position-absolute top-0 end-0 m-3" role="alert" style={{ zIndex: 1050 }}>
+          {message}
+        </div>
+      }
+      <Routes>
+        {/* rota 1: página inicial */}
+        <Route path="/" element={!token ? <HomePage /> : <Navigate to="/dashboard" />} />
 
-          {/* rota 2: página de login */}
-          <Route path="/login" element={!token ? <LoginPage handleLogin={handleLogin} message={message} /> : <Navigate to="/dashboard" />} />
+        {/* rota 2: página de login */}
+        <Route path="/login" element={!token ? <LoginPage handleLogin={handleLogin} message={message} /> : <Navigate to="/dashboard" />} />
 
-          {/* rota 3: página de cadastro */}
-          <Route path="/register" element={!token ? <RegisterPage handleRegister={handleRegister} message={message} /> : <Navigate to="/dashboard" />} />
+        {/* rota 3: página de cadastro */}
+        <Route path="/register" element={!token ? <RegisterPage handleRegister={handleRegister} message={message} /> : <Navigate to="/dashboard" />} />
 
-          {/* rota 4: painel (protegida) */}
-          <Route 
-            path="/dashboard" 
-            element={
-              token ? 
-              <DashboardPage currentUser={currentUser} adminData={adminData} handleLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
+        {/* rota 4: painel (protegida) */}
+        <Route 
+          path="/dashboard" 
+          element={
+            token ? 
+            <DashboardPage currentUser={currentUser} adminData={adminData} handleLogout={handleLogout} /> : 
+            <Navigate to="/login" />
+          } 
+        />
 
-          {/*rota fallback para paginas não encontradas*/}
-          <Route path="*" element={<Navigate to='/' />} />
-        </Routes>
+        {/*rota fallback para paginas não encontradas*/}
+        <Route path="*" element={<Navigate to='/' />} />
+      </Routes>
     </div>
   );
 }

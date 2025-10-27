@@ -1,0 +1,11 @@
+# Arquivo de segredos
+.env
+
+# Dependências do Python
+venv/
+__pycache__/
+*.pyc
+
+# Dependências do Node
+frontend/node_modules/
+frontend/build/
